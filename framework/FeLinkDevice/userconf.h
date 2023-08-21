@@ -1,7 +1,7 @@
 #ifndef _FELINK_DEV_USERCONF_
 #define _FELINK_DEV_USERCONF_
 
-#define FELINK_NAME  "fldev0"
+#define FELINK_DEFAULT_NAME  "fldev0"
 #define FELINK_TYPE  0x0000
 
 #define FELINK_ARCH  FELINK_ARM

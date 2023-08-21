@@ -4,20 +4,20 @@
 #include "userconf.h"
 
 /* 16-bit or 32-bit */
-typedef int             FLSINT;
-typedef unsigned int    FLUINT;
+typedef int             flsint;
+typedef unsigned int    fluint;
 /* 8-bit */
-typedef unsigned char   FLU8;
+typedef unsigned char   flu8;
 /* 16-bit */
-typedef short           FLS16;
-typedef unsigned short  FLU16;
+typedef short           fls16;
+typedef unsigned short  flu16;
 /* 32-bit */
 #if FELINK_ARCH == FELINK_C51
-typedef long            FLS32;
-typedef unsigned long   FLU32;
+typedef long            fls32;
+typedef unsigned long   flu32;
 #else
-typedef int             FLS32;
-typedef unsigned int    FLU32;
+typedef int             fls32;
+typedef unsigned int    flu32;
 #endif
 
 #endif // !_FELINK_DEV_TYPES_

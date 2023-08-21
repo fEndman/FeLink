@@ -20,15 +20,25 @@
 typedef enum
 {
     RES_OK = 0,
-    RES_DATA_AVAILABLE,
-    RES_ERR,
-    RES_ERR_ECC_UNSUPPORT,
-    RES_ERR_NOMEM,
-    RES_ERR_TRANSMIT,
-    RES_ERR_CHKSUM,
-    RES_ERR_CRYPT,
-    RES_ERR_CMD_INVALID,
-} FLRESULT;
+    RES_DATA_AVAILABLE = 1,
+    RES_HANDSHAKED = 2,
+    RES_PAIRED = 3,
+    RES_CONNECTED = 4,
+    RES_ERR = -1,
+    RES_ERR_ECC_UNSUPPORT = -2,
+    RES_ERR_NOMEM = -3,
+    RES_ERR_TRANSMIT = -4,
+    RES_ERR_CHKSUM = -5,
+    RES_ERR_CRYPT = -6,
+    RES_ERR_PERHAPS_ATTACK = -7,
+    RES_ERR_CMD_INVALID = -8,
+} flresult;
+
+typedef enum
+{
+    TX_TYPE_PCMD,
+    TX_TYPE_ACK,
+} fltxtype;
 
 typedef enum
 {
@@ -36,32 +46,32 @@ typedef enum
     STATE_HANDSHAKED,
     STATE_PAIRED,
     STATE_CONNECTED,
-} FLSTATE;
-
-struct flsav
-{
-    const char *name;
-    FLU8 *ecdh_pri_key;
-    FLU8 *ecdh_pub_key;
-    FLU8 *tea_key;
-};
+} flstate;
 
 struct fldev
 {
-    FLU32 id;
-    FLU32 type;
-    FLSTATE state;
-    FLU8 buf[FELINK_BUF_SIZE] FELINK_ATTR_ALIGN;
-    FLU32 salt;
-    FLU16 valid_data_len;
-    struct flsav sav;
+    flu32 id;
+    flu32 type;
+    flstate state;
+    flu8 buf[FELINK_BUF_SIZE] FELINK_ATTR_ALIGN;
+    flu16 valid_data_len;
+
+    flu32 connect_count;
+    flu32 salt;
+
+    const char *name;
+    const flu8 *ecdh_pri_key;
+    const flu8 *ecdh_pub_key;
+    const flu8 *tea_key;
 };
 
-FLRESULT fl_receive_handler(
+flresult fl_receive_handler(
     struct fldev *dev,
-    const FLU8 *bytes,
-    FLUINT count);
-FLRESULT fl_init(
+    const flu8 *bytes,
+    fluint count);
+flresult fl_create_key(
+    struct fldev *dev);
+flresult fl_init(
     struct fldev *dev);
 
 #endif // !_FELINK_DEV_FELINK_

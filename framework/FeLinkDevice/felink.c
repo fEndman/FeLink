@@ -17,20 +17,21 @@
 
 #define FELINK_CCMD_DEV_ACK 0xBA
 #define FELINK_CCMD_BASE_CONNECT 0xAC
+#define FELINK_CCMD_BASE_UNPAIR 0xAB
 
 #define FELINK_DCMD_DATA 0xAD
 
-FLU16 fl_rd16(const FLU8 *p)
+flu16 fl_rd16(const flu8 *p)
 {
-    FLU16 rv;
+    flu16 rv;
     rv = p[1];
     rv = rv << 8 | p[0];
     return rv;
 }
 
-FLU32 fl_rd32(const FLU8 *p)
+flu32 fl_rd32(const flu8 *p)
 {
-    FLU32 rv;
+    flu32 rv;
     rv = p[3];
     rv = rv << 8 | p[2];
     rv = rv << 8 | p[1];
@@ -38,36 +39,36 @@ FLU32 fl_rd32(const FLU8 *p)
     return rv;
 }
 
-void fl_wr16(FLU8 *p, FLU16 val)
+void fl_wr16(flu8 *p, flu16 val)
 {
-    *p++ = (FLU8)val;
+    *p++ = (flu8)val;
     val >>= 8;
-    *p++ = (FLU8)val;
+    *p++ = (flu8)val;
 }
 
-void fl_wr32(FLU8 *p, FLU32 val)
+void fl_wr32(flu8 *p, flu32 val)
 {
-    *p++ = (FLU8)val;
+    *p++ = (flu8)val;
     val >>= 8;
-    *p++ = (FLU8)val;
+    *p++ = (flu8)val;
     val >>= 8;
-    *p++ = (FLU8)val;
+    *p++ = (flu8)val;
     val >>= 8;
-    *p++ = (FLU8)val;
+    *p++ = (flu8)val;
 }
 
-FLU8 fl_chksum8(const FLU8 *bytes, FLUINT len)
+flu8 fl_chksum8(const flu8 *bytes, fluint len)
 {
-    FLU8 chksum8 = 0;
+    flu8 chksum8 = 0;
     while (len--)
         chksum8 += *(bytes++);
     return ~chksum8;
 }
 
-void fl_memcpy(void *dst, const void *src, FLUINT size)
+void fl_memcpy(void *dst, const void *src, fluint size)
 {
-    FLU8 *d = (FLU8 *)dst;
-    const FLU8 *s = (const FLU8 *)src;
+    flu8 *d = (flu8 *)dst;
+    const flu8 *s = (const flu8 *)src;
     if (dst < src)
     {
         while (size--)
@@ -91,9 +92,9 @@ void fl_strcpy(void *dst, const char *src)
     } while (*src++ != '\0');
 }
 
-FLUINT fl_strlen(const char *str)
+fluint fl_strlen(const char *str)
 {
-    FLUINT l = 0;
+    fluint l = 0;
     while (str[l] != '\0')
         l++;
     return l;
@@ -105,9 +106,9 @@ int fl_rng(uint8_t *dest, unsigned size) FELINK_C51_REENTRANT
 }
 
 #ifdef FELINK_BIG_ENDIAN
-void fl_endian_convert(FLU32 *buf, FLUINT len)
+void fl_endian_convert(flu32 *buf, fluint len)
 {
-    FLU32 temp;
+    flu32 temp;
     while (len--)
     {
         temp = *buf;
@@ -122,15 +123,15 @@ void fl_endian_convert(FLU32 *buf, FLUINT len)
 
 static void fl_get_key(
     struct fldev *dev,
-    FLU32 *key)
+    flu32 *key)
 {
-    FLU8 *key_le = (FLU8 *)key;
-    const FLU8 *keys = dev->sav.tea_key;
-    FLU32 ev = dev->salt;
-    FLU32 ev_rev = ~ev;
-    FLU32 ev_m2 = ev + ev;
-    FLU32 ev_rev_m2 = ev_rev + ev_rev;
-    FLUINT i;
+    flu8 *key_le = (flu8 *)key;
+    const flu8 *keys = dev->tea_key;
+    flu32 ev = dev->salt;
+    flu32 ev_rev = ~ev;
+    flu32 ev_m2 = ev + ev;
+    flu32 ev_rev_m2 = ev_rev + ev_rev;
+    fluint i;
 
     for (i = 0; i < 16; i += 4)
     {
@@ -145,15 +146,15 @@ static void fl_get_key(
     }
 
 #ifdef FELINK_BIG_ENDIAN
-    fl_endian_convert(key, 4)
+    fl_endian_convert(key, 4);
 #endif
 }
 
-static FLRESULT fl_pcmd_dev_handshake(
+static flresult fl_pcmd_dev_handshake(
     struct fldev *dev)
 {
-    FLUINT len = 14 + fl_strlen(dev->sav.name) + 1;
-    FLRESULT res;
+    fluint len = 14 + fl_strlen(dev->name) + 1;
+    flresult res;
 
     if (len > FELINK_BUF_SIZE)
         return RES_ERR_NOMEM;
@@ -166,7 +167,7 @@ static FLRESULT fl_pcmd_dev_handshake(
     fl_wr32(&dev->buf[4], dev->id);
     fl_wr32(&dev->buf[8], dev->type);
     fl_wr16(&dev->buf[12], FELINK_DEV_VERSION);
-    fl_strcpy(&dev->buf[14], dev->sav.name);
+    fl_strcpy(&dev->buf[14], dev->name);
     dev->buf[1] = fl_chksum8(dev->buf, len);
 
     res = fl_transmit(dev, dev->buf, len);
@@ -174,19 +175,20 @@ static FLRESULT fl_pcmd_dev_handshake(
         return res;
     dev->state = STATE_HANDSHAKED;
 
-    return RES_OK;
+    return RES_HANDSHAKED;
 }
 
-static FLRESULT fl_pcmd_dev_pair(
+static flresult fl_pcmd_dev_pair(
     struct fldev *dev,
-    const FLU8 *bytes,
-    FLUINT count)
+    const flu8 *bytes,
+    fluint count)
 {
 #if FELINK_ARCH == FELINK_C51
     volatile struct fldev *dev_temp = dev;
 #endif
-    FLU8 keylen = bytes[8];
-    FLRESULT res;
+    flu8 keylen = bytes[8];
+    flresult res;
+    int ures;
 
     if (keylen != uECC_BYTES * 2)
         return RES_ERR_ECC_UNSUPPORT;
@@ -195,14 +197,18 @@ static FLRESULT fl_pcmd_dev_pair(
         return RES_ERR_TRANSMIT;
 
     dev->valid_data_len = 0;
-    uECC_shared_secret(
+    ures = uECC_shared_secret(
         (uint8_t *)&bytes[9],
-        (uint8_t *)dev->sav.ecdh_pri_key,
+        (uint8_t *)dev->ecdh_pri_key,
         dev->buf);
+    if (!ures)
+        return RES_ERR_CRYPT;
 #if FELINK_ARCH == FELINK_C51
     dev = dev_temp;
 #endif
-    fl_save(dev, dev->buf, uECC_BYTES, SAVE_TEA_KEY);
+    res = fl_save(dev, dev->buf, uECC_BYTES, SAVE_TEA_KEY);
+    if (res)
+        return res;
 
     dev->buf[0] = FELINK_SIGN;
     dev->buf[1] = 0;
@@ -211,25 +217,27 @@ static FLRESULT fl_pcmd_dev_pair(
     fl_wr32(&dev->buf[4], dev->id);
     keylen = uECC_BYTES * 2;
     dev->buf[8] = keylen;
-    fl_memcpy(&dev->buf[9], dev->sav.ecdh_pub_key, keylen);
+    fl_memcpy(&dev->buf[9], dev->ecdh_pub_key, keylen);
     dev->buf[1] = fl_chksum8(dev->buf, 9 + keylen);
 
     res = fl_transmit(dev, dev->buf, 9 + keylen);
     if (res)
         return res;
+    dev->connect_count = 0;
     dev->state = STATE_PAIRED;
+    res = fl_save(dev, (flu8 *)&dev->connect_count, sizeof(flu32), SAVE_CONNECT_COUNT);
 
-    return RES_OK;
+    return RES_PAIRED;
 }
 
-static FLRESULT fl_pcmd_dev_id_change(
+static flresult fl_pcmd_dev_id_change(
     struct fldev *dev,
-    const FLU8 *bytes,
-    FLUINT count)
+    const flu8 *bytes,
+    fluint count)
 {
-    FLU32 nid = fl_rd32(&bytes[8]);
-    FLUINT len = 18 + fl_strlen(dev->sav.name) + 1;
-    FLRESULT res;
+    flu32 nid = fl_rd32(&bytes[8]);
+    fluint len = 18 + fl_strlen(dev->name) + 1;
+    flresult res;
 
     if (count < 12)
         return RES_ERR;
@@ -246,7 +254,7 @@ static FLRESULT fl_pcmd_dev_id_change(
     dev->id = nid;
     fl_wr32(&dev->buf[12], dev->type);
     fl_wr16(&dev->buf[16], FELINK_DEV_VERSION);
-    fl_strcpy(&dev->buf[18], dev->sav.name);
+    fl_strcpy(&dev->buf[18], dev->name);
     dev->buf[1] = fl_chksum8(dev->buf, len);
 
     res = fl_transmit(dev, dev->buf, len);
@@ -256,11 +264,11 @@ static FLRESULT fl_pcmd_dev_id_change(
     return fl_save(dev, &bytes[6], 4, SAVE_ID);
 }
 
-static FLRESULT fl_ccmd_dev_ack(
+static flresult fl_ccmd_dev_ack(
     struct fldev *dev,
-    FLU8 ack_sign)
+    flu8 ack_sign)
 {
-    FLU8 buf[9];
+    flu8 buf[9];
     buf[0] = FELINK_SIGN;
     buf[1] = 0;
     buf[2] = FELINK_CCMD;
@@ -271,14 +279,15 @@ static FLRESULT fl_ccmd_dev_ack(
     return fl_transmit(dev, buf, 9);
 }
 
-static FLRESULT fl_ccmd_base_connect_handler(
+static flresult fl_ccmd_base_connect_handler(
     struct fldev *dev,
-    const FLU8 *bytes,
-    FLUINT count)
+    const flu8 *bytes,
+    fluint count)
 {
-    FLU8 ack_chksum8;
-    FLU32 key[4];
-    FLRESULT res;
+    flu8 ack_chksum8;
+    flu32 key[4];
+    flu32 con_count;
+    flresult res;
 
     if (count < 16)
         return RES_ERR_TRANSMIT;
@@ -295,26 +304,60 @@ static FLRESULT fl_ccmd_base_connect_handler(
 
     if (fl_chksum8(dev->buf, 8) != 0)
         return RES_ERR_CRYPT;
+    con_count = fl_rd32(&dev->buf[4]);
+    if (con_count <= dev->connect_count)
+        return RES_ERR_PERHAPS_ATTACK;
 
     res = fl_ccmd_dev_ack(dev, ack_chksum8);
     if (res)
         return res;
+
+    dev->connect_count = con_count;
     dev->salt = fl_rd32(&dev->buf[0]);
     dev->state = STATE_CONNECTED;
+    res = fl_save(dev, &dev->buf[4], sizeof(flu32), SAVE_CONNECT_COUNT);
 
-    return RES_OK;
+    return RES_CONNECTED;
 }
 
-static FLRESULT fl_dcmd_data_handler(
+static flresult fl_ccmd_base_unpair_handler(
     struct fldev *dev,
-    const FLU8 *bytes,
-    FLUINT count)
+    const flu8 *bytes,
+    fluint count)
 {
-    FLU8 ack_chksum8;
-    FLS32 l = (FLS32)fl_rd32(&bytes[8]);
-    FLU32 n;
-    FLU32 key[4];
-    FLRESULT res;
+    flu32 key[4];
+    flresult res;
+
+    if (count < 16)
+        return RES_ERR_TRANSMIT;
+
+    dev->valid_data_len = 0;
+    fl_memcpy(dev->buf, &bytes[8], 8);
+
+    dev->salt = 0x01234567;
+    fl_get_key(dev, key);
+    res = fl_xxtea_byte_array_decrypt(dev->buf, 8, key);
+    if (res)
+        return res;
+
+    if (fl_chksum8(dev->buf, 8) != 0)
+        return RES_ERR_CRYPT;
+    if (fl_rd32(&dev->buf[4]) <= dev->connect_count)
+        return RES_ERR_PERHAPS_ATTACK;
+
+    return fl_create_key(dev);
+}
+
+static flresult fl_dcmd_data_handler(
+    struct fldev *dev,
+    const flu8 *bytes,
+    fluint count)
+{
+    flu8 ack_chksum8;
+    fls32 l = (fls32)fl_rd32(&bytes[8]);
+    flu32 n;
+    flu32 key[4];
+    flresult res;
     char is_plaintext_transmit = 0;
 
     if (l < 0)
@@ -361,20 +404,19 @@ static FLRESULT fl_dcmd_data_handler(
     return RES_DATA_AVAILABLE;
 }
 
-static FLRESULT fl_pcmd_handler(
+static flresult fl_pcmd_handler(
     struct fldev *dev,
-    const FLU8 *bytes,
-    FLUINT count)
+    const flu8 *bytes,
+    fluint count)
 {
-    FLU8 minor_cmd = bytes[3];
-    FLU32 id = fl_rd32(&bytes[4]);
+    flu8 minor_cmd = bytes[3];
+    flu32 id = fl_rd32(&bytes[4]);
 
     switch (minor_cmd)
     {
     case FELINK_PCMD_BASE_SEARCH:
-//        if (dev->state == STATE_PAIRED || dev->state == STATE_CONNECTED)
-//            break;
-		    dev->state = STATE_UNPAIRED;
+        if (dev->state == STATE_PAIRED || dev->state == STATE_CONNECTED)
+            break;
         return fl_pcmd_dev_handshake(dev);
     case FELINK_PCMD_BASE_PAIR:
         if (dev->id != id || dev->state != STATE_HANDSHAKED)
@@ -395,13 +437,13 @@ static FLRESULT fl_pcmd_handler(
     return RES_OK;
 }
 
-static FLRESULT fl_ccmd_handler(
+static flresult fl_ccmd_handler(
     struct fldev *dev,
-    const FLU8 *bytes,
-    FLUINT count)
+    const flu8 *bytes,
+    fluint count)
 {
-    FLU8 minor_cmd = bytes[3];
-    FLU32 id = fl_rd32(&bytes[4]);
+    flu8 minor_cmd = bytes[3];
+    flu32 id = fl_rd32(&bytes[4]);
 
     switch (minor_cmd)
     {
@@ -411,6 +453,10 @@ static FLRESULT fl_ccmd_handler(
         return fl_ccmd_base_connect_handler(dev, bytes, count);
     case FELINK_CCMD_DEV_ACK:
         break;
+    case FELINK_CCMD_BASE_UNPAIR:
+        if (dev->id != id || dev->state == STATE_UNPAIRED || dev->state == STATE_HANDSHAKED)
+            break;
+        return fl_ccmd_base_unpair_handler(dev, bytes, count);
     default:
         return RES_ERR_CMD_INVALID;
     }
@@ -418,13 +464,13 @@ static FLRESULT fl_ccmd_handler(
     return RES_OK;
 }
 
-static FLRESULT fl_dcmd_handler(
+static flresult fl_dcmd_handler(
     struct fldev *dev,
-    const FLU8 *bytes,
-    FLUINT count)
+    const flu8 *bytes,
+    fluint count)
 {
-    FLU8 minor_cmd = bytes[3];
-    FLU32 id = fl_rd32(&bytes[4]);
+    flu8 minor_cmd = bytes[3];
+    flu32 id = fl_rd32(&bytes[4]);
 
     switch (minor_cmd)
     {
@@ -439,13 +485,13 @@ static FLRESULT fl_dcmd_handler(
     return RES_OK;
 }
 
-FLRESULT fl_receive_handler(
+flresult fl_receive_handler(
     struct fldev *dev,
-    const FLU8 *bytes,
-    FLUINT count)
+    const flu8 *bytes,
+    fluint count)
 {
-    FLU8 major_cmd = bytes[2];
-    FLU8 minor_cmd = bytes[3];
+    flu8 major_cmd = bytes[2];
+    flu8 minor_cmd = bytes[3];
 
     if (bytes[0] != FELINK_SIGN)
         return RES_ERR_CMD_INVALID;
@@ -472,20 +518,45 @@ FLRESULT fl_receive_handler(
     }
 }
 
-FLRESULT fl_init(
+flresult fl_create_key(
     struct fldev *dev)
 {
-    FLRESULT res;
+    flu8 pri_key[uECC_BYTES], pub_key[uECC_BYTES * 2];
+#if FELINK_ARCH == FELINK_C51
+    volatile struct fldev *dev_temp = dev;
+#endif
+
+    dev->state = STATE_UNPAIRED;
+    if (!uECC_make_key(pub_key, pri_key))
+        return RES_ERR;
+#if FELINK_ARCH == FELINK_C51
+    dev = dev_temp;
+#endif
+    fl_save(dev, pri_key, uECC_BYTES, SAVE_ECDH_PRI_KEY);
+    fl_save(dev, pub_key, uECC_BYTES * 2, SAVE_ECDH_PUB_KEY);
+
+#if FELINK_ARCH == FELINK_C51
+    /**** 空调用ramdom函数一次，避免g_rng_function函数指针造成的调用树异常 ****/
+    fl_random((flu8 *)0, 0);
+#endif
+		
+    return RES_OK;
+}
+
+flresult fl_init(
+    struct fldev *dev)
+{
+    flresult res;
 
     uECC_set_rng(&fl_rng);
 
     dev->state = STATE_UNPAIRED;
-    res = fl_reload(dev);
+    res = fl_load(dev);
     if (res)
         return res;
     if (dev->id == 0)
         return RES_ERR;
-    dev->salt = 0;
+    dev->type = FELINK_TYPE;
     dev->valid_data_len = 0;
 
     return RES_OK;

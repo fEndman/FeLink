@@ -4,9 +4,9 @@
 /* User Code BEGIN */
 
 /* User Code END */
-FLRESULT fl_random(
-    FLU8 *dest,
-    FLUINT size)
+flresult fl_random(
+    flu8 *dest,
+    fluint size)
 {
     /* User Code BEGIN */
 
@@ -18,10 +18,10 @@ FLRESULT fl_random(
 /* User Code BEGIN */
 
 /* User Code END */
-FLRESULT fl_transmit(
+flresult fl_transmit(
     struct fldev *dev,
-    const FLU8 *bytes,
-    FLUINT count)
+    const flu8 *bytes,
+    fluint count)
 {
     /* User Code BEGIN */
 
@@ -33,10 +33,10 @@ FLRESULT fl_transmit(
 /* User Code BEGIN */
 
 /* User Code END */
-FLRESULT fl_save(
+flresult fl_save(
     struct fldev *dev,
-    const FLU8 *bytes,
-    FLUINT count,
+    const flu8 *bytes,
+    fluint count,
     FLSAVETYPE type)
 {
     /* User Code BEGIN */
@@ -49,7 +49,7 @@ FLRESULT fl_save(
 /* User Code BEGIN */
 
 /* User Code END */
-FLRESULT fl_reload(
+flresult fl_load(
     struct fldev *dev)
 {
     /* User Code BEGIN */
