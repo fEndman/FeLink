@@ -1,0 +1,12 @@
+.vscode/
+Objects/
+*.uvgui.*
+*.__i
+*.obj
+*.iex
+*.hex
+*.htm
+*.lnp
+*.SBR
+*.lst
+*.map
