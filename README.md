@@ -3,8 +3,8 @@ FeLink is a lightweight and cross-platform encrypted networking communication fr
 FeLink consists of a "base" and several "dev", the "base" side acts as a gateway to forward the user's control data and provide advanced functions, and the "dev" side performs the corresponding control actions.
   
 ### Directory  
-1. framework/  : contains "base" side framework and "dev" side framework  
-2. template/   : contains instances of "base" side, "dev" side, and user client  
+- framework/  : contains "base" side framework and "dev" side framework  
+- template/   : contains instances of "base" side, "dev" side, and user client  
 ### Framework usage  
 1. "dev" side:  
     1. move "FeLinkDevice/" folder to your project  
