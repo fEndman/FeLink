@@ -60,21 +60,8 @@ FLRESULT fl_xxtea_decrypt(FLU32 *ciphetext, FLUINT dword_len, FLU32 *key)
 }
 
 #ifdef FELINK_BIG_ENDIAN
-void fl_endian_convert(FLU32 *buf, FLUINT len)
-{
-    FLU32 temp;
-    while (len--)
-    {
-        temp = *buf;
-        *buf = ((temp & 0x000000FF) << 24) |
-               ((temp & 0x0000FF00) << 8) |
-               ((temp & 0x00FF0000) >> 8) |
-               ((temp & 0xFF000000) >> 24);
-        buf++;
-    }
-}
+void fl_endian_convert(FLU32 *buf, FLUINT len)；
 #endif
-
 FLRESULT fl_xxtea_byte_array_encrypt(FLU8 *plaintext, FLUINT byte_len, FLU32 *key)
 {
     FLRESULT res;

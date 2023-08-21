@@ -4,7 +4,7 @@
 #define MX (((z >> 5) ^ (y << 2)) + ((y >> 3) ^ (z << 4))) ^ ((sum ^ y) + (key[(p & 3) ^ e] ^ z))
 #define DELTA 0x9e3779b9
 
-int fl_xxtea_encrypt(void *plaintext, size_t dword_len, uint32_t *key)
+int fl_xxtea_encrypt(uint32_t *plaintext, size_t dword_len, uint32_t *key)
 {
     uint32_t *buf = (uint32_t *)plaintext;
     size_t n = dword_len - 1, p;
@@ -32,7 +32,7 @@ int fl_xxtea_encrypt(void *plaintext, size_t dword_len, uint32_t *key)
     return 0;
 }
 
-int fl_xxtea_decrypt(void *ciphetext, size_t dword_len, uint32_t *key)
+int fl_xxtea_decrypt(uint32_t *ciphetext, size_t dword_len, uint32_t *key)
 {
     uint32_t *buf = (uint32_t *)ciphetext;
     size_t n = dword_len - 1, p;

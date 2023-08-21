@@ -5,8 +5,8 @@
 
 typedef enum
 {
-    ID,
-    TEA_KEY,
+    SAVE_ID,
+    SAVE_TEA_KEY,
 } FLSAVETYPE;
 
 FLRESULT fl_random(
