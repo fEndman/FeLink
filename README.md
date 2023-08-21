@@ -1,5 +1,5 @@
 # FeLink
-FeLink is a lightweight and cross-platform encrypted networking communication framework for IoT.
+FeLink is a lightweight and cross-platform encrypted networking communication framework for IoT.  
 FeLink consists of a "base" and several "dev", the "base" side acts as a gateway to forward the user's control data and provide advanced functions, and the "dev" side performs the corresponding control actions.
   
 ### Directory  
