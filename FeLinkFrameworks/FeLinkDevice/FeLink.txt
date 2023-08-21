@@ -1,0 +1,14 @@
+TEA:{}  chksum8:<>
+|                   |   |   |           |               |               |
+主机搜索            AAh AAh
+从机握手            AAh BAh ID[4]       设备类型[2]     名字[n]
+主机配对            AAh ABh ID[4]       n[1]chksum8[1]<ECC公钥[n]>
+从机配对            AAh BBh ID[4]       n[1]chksum8[1]<ECC公钥[n]>
+主机报ID不可用      AAh AEh ID[4]       可用ID[4]
+从机更改ID          AAh BEh 新ID[4]     原ID[4]         设备类型[2]     名字[n]
+//主机查询设备      AAh EAh ID[4]
+
+从机应答            CCh BAh ID[4]       chksum8[1](<接收的数据包明文>)
+主机连接            CCh ACh ID[4]       {chksum8[1]<随机数[3]> 00000000h}
+
+主机数据包          DDh ADh ID[4]       l[2]{n[1]chksum8[1]<随机数[2] data[n](align)>}
