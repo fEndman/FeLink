@@ -3,3 +3,4 @@ MDK-ARM/FeLinkTest/
 Drivers/CMSIS/
 JLinkLog.txt
 *.lst
+*.uvguix*
