@@ -11,7 +11,7 @@
 
 #define NRF24_PAYLOAD_WIDTH 32
 #if NRF24_PAYLOAD_WIDTH < 2
-#error NRF24_PAYLOAD_WIDTH should be bigger than 1
+#error NRF24_PAYLOAD_WIDTH should be bigger than 2
 #endif
 #define _MARCO_TO_STR(marco) #marco
 #define MARCO_TO_STR(marco) _MARCO_TO_STR(marco)

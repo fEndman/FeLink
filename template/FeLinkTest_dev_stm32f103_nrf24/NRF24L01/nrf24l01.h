@@ -6,7 +6,7 @@
 
 #define NRF24_PAYLOAD_WIDTH 32
 
-extern uint8_t nrf24l01_buf[32];
+extern uint8_t nrf24l01_buf[NRF24_PAYLOAD_WIDTH];
 extern volatile uint8_t nrf24l01_data_count;
 extern volatile uint8_t nrf24l01_data_en_rx;
 extern volatile uint8_t nrf24l01_status;

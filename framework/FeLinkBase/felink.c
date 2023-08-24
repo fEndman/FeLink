@@ -587,7 +587,7 @@ static int fl_pcmd_dev_pair_handler(
             return EPROTONOSUPPORT;
 
         uECC_shared_secret(&data[9], b->pri_key, d->tea_key, FELINK_uECC_CURVE);
-        d->connect_count = 1;
+        fl_random((uint8_t *)&d->connect_count, 3);
         d->state = STATE_PAIRED;
         fl_call_devs_change(b, d, d->id, DEV_CHANGE_PAIR);
     }

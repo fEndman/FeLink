@@ -20,7 +20,6 @@ int nrf24l01_config(void)
   if (!res)
     return 1;
 
-//  nRF24_DisableAA(0xFF);
   nRF24_SetRFChannel(113);
   nRF24_SetDataRate(nRF24_DR_2Mbps);
   nRF24_SetCRCScheme(nRF24_CRC_2byte);
