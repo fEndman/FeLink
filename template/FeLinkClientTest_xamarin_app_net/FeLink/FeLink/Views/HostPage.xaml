@@ -1,0 +1,107 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="FeLink.Views.HostPage"
+			 Title="{Binding Title}">
+	<ContentPage.ToolbarItems>
+		<ToolbarItem Text="{Binding Username}" Clicked="ToolbarItemLogin_Clicked"/>
+		<ToolbarItem Text="断开" Clicked="ToolbarItemShutdown_Clicked"/>
+	</ContentPage.ToolbarItems>
+
+	<ContentPage.Content>
+		<StackLayout VerticalOptions="Start">
+			<Label
+				Text = "无法连接到服务器"
+				IsVisible="{Binding IsDisconnected}"
+				Padding = "10"
+				FontSize = "18"
+				TextColor = "DimGray"
+				HorizontalOptions = "Center"/>
+
+			<CollectionView 
+				x:Name="CollectionViewPairedDevices"
+				ItemsSource="{Binding PairedDevices}"
+				IsVisible="{Binding IsConnected}"
+				Margin="10"
+				SelectionMode="Single"
+				SelectionChanged="CollectionViewPairedDevices_SelectionChanged"
+				VerticalOptions="Start">
+
+				<CollectionView.ItemsLayout>
+					<LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
+				</CollectionView.ItemsLayout>
+
+				<CollectionView.ItemTemplate>
+					<DataTemplate>
+						<SwipeView>
+							<SwipeView.LeftItems>
+								<SwipeItems>
+									<SwipeItem
+										Text="断开"
+										IconImageSource="unlink.png"
+										BackgroundColor="LightPink"
+										Command="{Binding UnpairCommand}"/>
+								</SwipeItems>
+							</SwipeView.LeftItems>
+
+							<Grid ColumnDefinitions="50,100,*" ColumnSpacing="10">
+								<Image Source="{Binding Icon}" BackgroundColor="Transparent" Grid.Column="0" WidthRequest="50" HeightRequest="50" VerticalOptions="Center" Aspect="AspectFit"/>
+								<StackLayout Grid.Column="1">
+									<Label Text="{Binding Name}" FontSize="22"/>
+									<Label Text="{Binding ID}" FontSize="14" TextColor="Silver"/>
+								</StackLayout>
+								<ContentView Content="{Binding CustomControl}" Grid.Column="2" HorizontalOptions="End"/>
+							</Grid>
+						</SwipeView>
+					</DataTemplate>
+				</CollectionView.ItemTemplate>
+			</CollectionView>
+
+			<Frame
+				Margin="20, 0"
+				Padding="2"
+				IsVisible="{Binding IsConnected}"
+				BackgroundColor="LightGray"
+				HasShadow="False"/>
+
+			<Label
+				Text = "下拉搜索设备"
+				IsVisible="{Binding IsConnected}"
+				FontSize = "Body"
+				TextColor = "LightGray"
+				HorizontalOptions = "Center"/>
+
+			<RefreshView
+				IsVisible="{Binding IsConnected}"
+				IsRefreshing="{Binding IsScanning, Mode=OneWay}"
+				Command="{Binding ScanCommand}">
+				
+				<CollectionView 
+					x:Name="CollectionViewHandshakedDevices"
+					ItemsSource="{Binding HandshakedDevices}"
+					Margin="10"
+					SelectionMode="Single"
+					SelectionChanged="CollectionViewHandshakedDevices_SelectionChanged">
+
+					<CollectionView.ItemsLayout>
+						<LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
+					</CollectionView.ItemsLayout>
+
+					<CollectionView.ItemTemplate>
+						<DataTemplate>
+							<Grid ColumnDefinitions="50,100,40,*" ColumnSpacing="10">
+								<Image Source="{Binding Icon}" Grid.Column="0" WidthRequest="50" HeightRequest="50" VerticalOptions="Center" Aspect="AspectFit"/>
+								<StackLayout Grid.Column="1">
+									<Label Text="{Binding Name}" FontSize="22"/>
+									<Label Text="{Binding ID}" FontSize="14" TextColor="Silver"/>
+								</StackLayout>
+								<ActivityIndicator IsRunning="{Binding IsRunning, Mode=OneWay}" Grid.Column="2" WidthRequest="30" HeightRequest="30"/>
+								<ContentView Content="{Binding CustomControl}" Grid.Column="3" HorizontalOptions="End"/>
+							</Grid>
+						</DataTemplate>
+					</CollectionView.ItemTemplate>
+				</CollectionView>
+			</RefreshView>
+		</StackLayout>
+	</ContentPage.Content>
+</ContentPage>

@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="FeLink.Views.RegisterPage"
+			 Title="注册">
+    <ContentPage.Content>
+		<ScrollView>
+			<StackLayout Padding="10,0,10,0" VerticalOptions="Center">
+				<Label 
+					Text="用户名:"
+					FontSize="Body"
+					Padding="20,0"/>
+				<Entry 
+					x:Name="EntryUsername"
+					Margin="10, 0"/>
+				<Label
+					Text="密码:"
+					FontSize="Body"
+					Padding="20,0"/>
+				<Entry
+					x:Name="EntryPassword"
+					IsPassword="True"
+					Margin="10, 0"/>
+				<Label
+					Text="重复密码:"
+					FontSize="Body"
+					Padding="20,0"/>
+				<Entry
+					x:Name="EntryPassword2"
+					IsPassword="True"
+					Margin="10, 0"/>
+				<StackLayout
+					Orientation="Horizontal"
+					Margin="0, 0, 10, 10"
+					HorizontalOptions="EndAndExpand"
+					FlowDirection="RightToLeft">
+					<CheckBox x:Name="CheckBoxIsUseOnly"/>
+					<Label Text="仅有使用权限" VerticalOptions="Center"/>
+				</StackLayout>
+				<Button
+					x:Name="ButtonRegister"
+					Text="注册"
+					Clicked="ButtonRegister_Clicked"/>
+			</StackLayout>
+		</ScrollView>
+	</ContentPage.Content>
+</ContentPage>

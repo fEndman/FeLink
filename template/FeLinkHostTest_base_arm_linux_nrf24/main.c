@@ -39,6 +39,7 @@ void change_handler(struct fl_host_i *host, struct fl_dev_i *dev, int type, void
         autosave_add_change(*felink->autosave, AUTOSAVE_BASE_CHANGE);
         break;
     case HOST_CHANGE_USER_ADD:
+    case HOST_CHANGE_USER_CHANGE:
     case HOST_CHANGE_USER_REMOVE:
     case HOST_CHANGE_USER_DEV_ADD:
     case HOST_CHANGE_USER_DEV_REMOVE:

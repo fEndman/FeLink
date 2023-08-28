@@ -605,8 +605,6 @@ static int host_ccmd_register_handler(struct fl_client *c, cJSON *json)
     if (!cJSON_IsString(json_username))
         return ENOMSG;
     char *username = cJSON_GetStringValue(json_username);
-    if (host_user_get_by_name(c->host, username) != NULL)
-        goto host_ccmd_register_error;
 
     cJSON *json_password = cJSON_GetObjectItemCaseSensitive(json, "password");
     if (!cJSON_IsString(json_password))
@@ -620,9 +618,23 @@ static int host_ccmd_register_handler(struct fl_client *c, cJSON *json)
     uint8_t password_hash[HOST_PASSWORD_HASH_SIZE], password_salt[HOST_PASSWORD_SALT_SIZE];
     host_random(password_salt, HOST_PASSWORD_SALT_SIZE);
     PKCS5_PBKDF2_HMAC_SHA1(password, -1, password_salt, HOST_PASSWORD_SALT_SIZE, 2048, HOST_PASSWORD_HASH_SIZE, password_hash);
-    struct fl_user *u = host_user_add(c->host, username, password_hash, password_salt, cJSON_IsTrue(json_is_use_only));
-    if (u == NULL)
-        goto host_ccmd_register_error;
+
+    struct fl_user *u = host_user_get_by_name(c->host, username);
+    if (u != NULL)
+    {
+        if (!u->is_use_only)
+            goto host_ccmd_register_error;
+        memcpy(u->password_hash, password_hash, HOST_PASSWORD_HASH_SIZE);
+        memcpy(u->password_salt, password_salt, HOST_PASSWORD_SALT_SIZE);
+        u->is_use_only = cJSON_IsTrue(json_is_use_only);
+        host_call_host_change(c->host, NULL, HOST_CHANGE_USER_CHANGE);
+    }
+    else
+    {
+        struct fl_user *u = host_user_add(c->host, username, password_hash, password_salt, cJSON_IsTrue(json_is_use_only));
+        if (u == NULL)
+            goto host_ccmd_register_error;
+    }
 
     host_printf(H_PRINT_INFO, "Host: client %s:%hu registers <%s>\n", inet_ntoa(c->addr.sin_addr), ntohs(c->addr.sin_port), username);
 
@@ -745,7 +757,7 @@ static void *host_receive_thread(void *args)
     host_user_client_add(h->users[HOST_USER_GUEST], c);
 
     host_call_host_change(c->host, NULL, HOST_CHANGE_CLIENT_CON);
-    host_printf(H_PRINT_INFO, "Host: client %s:%hd connected\n", inet_ntoa(c->addr.sin_addr), ntohs(c->addr.sin_port));
+    host_printf(H_PRINT_INFO, "Host: client %s:%hu connected\n", inet_ntoa(c->addr.sin_addr), ntohs(c->addr.sin_port));
 
     struct pollfd pfd;
     pfd.fd = c->fd;

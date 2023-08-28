@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="FeLink.Views.AboutPage"
+             Title="关于">
+    <ScrollView>
+		<StackLayout>
+			<Image
+				Source="felink_transparent.png"
+				BackgroundColor="Transparent"
+				VerticalOptions="Center"/>
+			<StackLayout Margin="40,0">
+				<Label
+					Text="连接你的设备!"
+					FontSize="Title"
+					FontAttributes="Bold"
+					HorizontalOptions="Center"/>
+				<StackLayout Orientation="Horizontal" Margin="0,20,0,0">
+					<Image
+						Source="github.png"
+						HeightRequest="70"/>
+					<Button
+						x:Name="ButtonGithub"
+						Text="项目Github储存库"
+						TextTransform="None"
+						FontSize="Medium"
+						TextColor="White"
+						HeightRequest="70"
+						BackgroundColor="Gray"
+						CornerRadius="35"
+						Clicked="ButtonGithub_Clicked"
+						HorizontalOptions="FillAndExpand"/>
+				</StackLayout>
+				<Label
+					Text="作者: f_Endman"
+					TextColor="LightGray"
+					FontSize="Small"
+					Margin="0,20"
+					HorizontalOptions="End"/>
+			</StackLayout>
+		</StackLayout>
+    </ScrollView>
+</ContentPage>

@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="FeLink.Views.LoginPage"
+			 Title="登录">
+    <ContentPage.Content>
+		<ScrollView>
+			<StackLayout Padding="10,0,10,0" VerticalOptions="Center">
+				<Label 
+					Text="用户名:"
+					FontSize="Body"
+					Padding="20,0"/>
+				<Entry 
+					x:Name="EntryUsername"
+					Margin="10, 0"/>
+				<Label
+					Text="密码:"
+					FontSize="Body"
+					Padding="20,0"/>
+				<Entry
+					x:Name="EntryPassword"
+					IsPassword="True"
+					Margin="10, 0"/>
+				<Button
+					x:Name="ButtonChangePassword"
+					Text="更改密码"
+					TextColor="LightGray"
+					FontSize="Body"
+					BackgroundColor="Transparent"
+					Margin="0, 0, 10, 20"
+					IsVisible="False"
+					HorizontalOptions="End"
+					Clicked="ButtonChangePassword_Clicked"/>
+				<Button
+					x:Name="ButtonLogin"
+					Text="登录"
+					Clicked="ButtonLogin_Clicked"/>
+			</StackLayout>
+		</ScrollView>
+    </ContentPage.Content>
+</ContentPage>

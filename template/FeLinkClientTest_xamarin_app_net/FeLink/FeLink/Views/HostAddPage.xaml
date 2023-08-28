@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="FeLink.Views.HostAddPage"
+			 Title="新基站">
+	<ContentPage.Content>
+		<ScrollView>
+			<Grid RowDefinitions="*,400">
+				<ImageButton
+					x:Name="ImageButtonQR"
+					Grid.Row="0"
+					Source="qr_code.png"
+					HeightRequest="200"
+					WidthRequest="200"
+					CornerRadius="100"
+					HorizontalOptions="Center"
+					VerticalOptions="Center"
+					Clicked="ImageButtonQR_Clicked"/>
+				<StackLayout Grid.Row="1">
+					<Label
+						Text="按上方按钮扫描设备上的二维码 或者手动输入地址"
+						Margin="20"
+						HorizontalOptions="Center"/>
+					<Label 
+						Text="地址(ip:port):"
+						FontSize="Body"
+						Padding="20,0"/>
+					<Entry 
+						x:Name="EntryAddress"
+						Margin="20, 0"/>
+					<Label
+						Text="给这个基站起一个名字:"
+						FontSize="Body"
+						Padding="20,0"/>
+					<Entry
+						x:Name="EntryName"
+						Text="基站"
+						Margin="20, 0"/>
+					<Button
+						Text="连接"
+						Margin="20"
+						Clicked="ButtonConnect_Clicked"/>
+				</StackLayout>
+			</Grid>
+		</ScrollView>
+    </ContentPage.Content>
+</ContentPage>
